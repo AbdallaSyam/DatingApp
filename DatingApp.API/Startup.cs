@@ -28,9 +28,17 @@ namespace DatingApp.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(x=>x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DataContext>(x=>x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            //To Avoid Origin Error
             services.AddCors();
+            //we add our repository as a service here  we have three options 
+            // services.AddSingleton() bad in concreent requests
+            // addtransient called per request  
+            //services.AddTransient<IAuthRepository,AuthRepository>();
+            //called per request  
+            services.AddScoped<IAuthRepository,AuthRepository>();
+            services.AddScoped<DataContext,DataContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,7 +54,8 @@ namespace DatingApp.API
             }
 
             // app.UseHttpsRedirection();
-            app.UseCors(X =>X.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            //To Avoid Origin Error
+            app.UseCors(X =>X.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); app.UseCors(X =>X.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
         }
     }

@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Threading.Tasks;
 using DatingApp.API.Model;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ namespace DatingApp.API.Data
          private readonly DataContext _Context;
          public AuthRepository(DataContext context)
         {
-            context=this._Context;
+            _Context = context;
         }
       
 
@@ -42,7 +43,21 @@ namespace DatingApp.API.Data
           User.PasswordHash = PasswordHash;
           User.PasswordSalt = PasswordSalt;
           await _Context.Users.AddAsync(User);
-          await _Context.SaveChangesAsync();
+
+
+try
+{
+await _Context.SaveChangesAsync();
+}
+catch(DataException DE)
+{
+
+}
+catch(Exception DE)
+{
+
+}
+          
 
           return User;
       }
@@ -50,14 +65,8 @@ namespace DatingApp.API.Data
      
         public async Task <bool> UserExist (string Username) {
 
-        var user = await _Context.Users.AnyAsync(x=>x.UserName==Username);
-        if(user){
-            return true;
-        }
-        else{
-            return false;
-        }
-
+        return await _Context.Users.AnyAsync(x=>x.UserName==Username);
+      
       }
 
 

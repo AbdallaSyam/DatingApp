@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DatingApp.API.Data;
+using DatingApp.API.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,9 @@ namespace DatingApp.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
    // http://localhost:5000
+
+   // andy controller in ASPCore inhirets from ControllerBase  which allow access to ex (IActionResult) not contriller like MVC
+    
     public class ValuesController : ControllerBase
     {
          private readonly DataContext _context;
@@ -38,8 +42,15 @@ namespace DatingApp.API.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody] Value valueobj)
         {
+            var valueVar = new Value{
+                Name=valueobj.Name,
+                ID=7
+            
+            };
+            _context.Add(valueVar);
+            _context.SaveChanges();
         }
 
         // PUT api/values/5
