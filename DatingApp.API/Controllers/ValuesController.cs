@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using DatingApp.API.Data;
 using DatingApp.API.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DatingApp.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
    // http://localhost:5000
@@ -31,7 +33,7 @@ namespace DatingApp.API.Controllers
             var Values = await _context.Values.ToListAsync();
             return Ok(Values);
         }
-
+        [AllowAnonymous ]
         // GET api/values/5
         [HttpGet("{id}")]
         public async Task <IActionResult> GetValues(int id)
