@@ -46,7 +46,11 @@ namespace DatingApp.API.Controllers
           return StatusCode(201);
         }
         [HttpPost("Login")]
-            public async Task <IActionResult> Login( UserForLoginDTO UserForLoginDTO){
+            public async Task <IActionResult> Login( UserForLoginDTO UserForLoginDTO)
+            {
+
+                throw new Exception("Computer Says No");
+
          var User =await _repo.Login(UserForLoginDTO.Username,UserForLoginDTO.Password);
          if(User==null){
              return Unauthorized();
@@ -78,7 +82,8 @@ namespace DatingApp.API.Controllers
              });
 
          }
-      
+
+
     }
 
 
