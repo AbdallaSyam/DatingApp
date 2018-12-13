@@ -49,7 +49,7 @@ namespace DatingApp.API.Controllers
             public async Task <IActionResult> Login( UserForLoginDTO UserForLoginDTO)
             {
 
-                throw new Exception("Computer Says No");
+                // throw new Exception("Computer Says No");
 
          var User =await _repo.Login(UserForLoginDTO.Username,UserForLoginDTO.Password);
          if(User==null){
