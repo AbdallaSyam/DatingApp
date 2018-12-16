@@ -45,19 +45,11 @@ namespace DatingApp.API.Data
           await _Context.Users.AddAsync(User);
 
 
-try
-{
+
 await _Context.SaveChangesAsync();
-}
-catch(DataException DE)
-{
 
-}
-catch(Exception DE)
-{
 
-}
-          
+     
 
           return User;
       }
