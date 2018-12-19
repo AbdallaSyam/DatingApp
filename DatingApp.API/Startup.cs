@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using DatingApp.API.Helper;
+using AutoMapper;
 
 namespace DatingApp.API
 {
@@ -34,19 +35,22 @@ namespace DatingApp.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(x=>x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            //To Avoid Origin Error
-            services.AddCors();
-            //we add our repository as a service here  we have three options 
-            // services.AddSingleton() bad in concreent requests
-            // addtransient called per request  
-            //services.AddTransient<IAuthRepository,AuthRepository>();
-            //called per request  
-            services.AddScoped<IAuthRepository,AuthRepository>();
-            services.AddScoped<DataContext,DataContext>();
-            
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(Options=>{
+            #region DBContext
+                 services.AddDbContext<DataContext>(x=>x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            #endregion
+           
+             #region AddScopedServices (InjectionDependency)
+               services.AddScoped<DataContext,DataContext>();
+               services.AddScoped<IAuthRepository,AuthRepository>();
+               services.AddScoped<IDateRepository,DatingRepository>();
+            #endregion
+
+             #region AddSeedingService
+                 services.AddTransient<Seed>();
+             #endregion
+
+             #region TokenAuthentication
+                  services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(Options=>{
                 Options.TokenValidationParameters= new TokenValidationParameters{
 
                     ValidateIssuerSigningKey = true,
@@ -55,10 +59,23 @@ namespace DatingApp.API
                     ValidateAudience = false
                 };
             });
+             #endregion
+
+         
+           //Avoid the Cors Issue
+            services.AddCors();
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            .AddJsonOptions(Opt=>{
+              Opt.SerializerSettings.ReferenceLoopHandling =Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+
+            services.AddAutoMapper();
+    
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,Seed seeder)
         {
             if (env.IsDevelopment())
             {
@@ -66,8 +83,8 @@ namespace DatingApp.API
             }
             else
             {
-               
-                app.UseExceptionHandler(builder => {
+               #region HandleErrorInProductionEnvironment
+                       app.UseExceptionHandler(builder => {
                     builder.Run(async context => {
                    
                         context.Response.StatusCode=(int)HttpStatusCode.InternalServerError;
@@ -78,12 +95,17 @@ namespace DatingApp.API
                         }
                     });
                 });
+               #endregion
+            
                 // app.UseHsts();
             }
 
             // app.UseHttpsRedirection();
-            //To Avoid Origin Error
+            // seeder.SeedUsers();
+
+                       //To Avoid Origin Error
             app.UseCors(X =>X.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); app.UseCors(X =>X.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+                       //To Authenticate the services            
             app.UseAuthentication();
             app.UseMvc();
         }
