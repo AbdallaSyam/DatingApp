@@ -35,7 +35,7 @@ namespace DatingApp.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            #region DBContext
+             #region DBContext
                  services.AddDbContext<DataContext>(x=>x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             #endregion
            
@@ -49,7 +49,7 @@ namespace DatingApp.API
                  services.AddTransient<Seed>();
              #endregion
 
-             #region TokenAuthentication
+             #region TokenAuthentication    
                   services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(Options=>{
                 Options.TokenValidationParameters= new TokenValidationParameters{
 
