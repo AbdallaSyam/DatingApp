@@ -12,6 +12,8 @@ namespace DatingApp.API.Model
             public User User { get; set ;}
             public int UserID { get; set ;}
 
+            public string PublicId { get; set ;}
+
 }
 }
 

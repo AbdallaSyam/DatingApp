@@ -35,6 +35,9 @@ namespace DatingApp.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //AddSinglton :- objects are the same for every object and every request.
+            //AddTransient:- objects are always different; a new instance is provided to every controller and every service.
+            //AddScoped :-   objects are the same within a request, but different across different requests.
              #region DBContext
                  services.AddDbContext<DataContext>(x=>x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             #endregion
@@ -65,6 +68,8 @@ namespace DatingApp.API
            //Avoid the Cors Issue
             services.AddCors();
 
+            services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySetting"));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
             .AddJsonOptions(Opt=>{
               Opt.SerializerSettings.ReferenceLoopHandling =Newtonsoft.Json.ReferenceLoopHandling.Ignore;
@@ -75,6 +80,7 @@ namespace DatingApp.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        //Order Is Must
         public void Configure(IApplicationBuilder app, IHostingEnvironment env,Seed seeder)
         {
             if (env.IsDevelopment())
